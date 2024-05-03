@@ -150,6 +150,13 @@
                   skip_el.click()
                   return
               }
+              // 查找挑战传奇按钮
+              var legendary_el = document.querySelector('a[data-test="legendary-start-button"]')
+              if (legendary_el) {
+                // 找到"继续"按钮并点击
+                legendary_el.parentElement.nextElementSibling.children[0].children[1].click()
+                return
+            }
           }
 
           // Control键, 点击扬声器按钮播放语音
