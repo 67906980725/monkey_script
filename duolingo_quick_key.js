@@ -145,7 +145,7 @@
           }
           // 按z键时如果页面有"不,谢谢"按钮, 就点击它
           if (event.key == 'z') {
-              var skip_el = document.querySelector('button[data-test="plus-no-thanks"]')
+              var skip_el = document.querySelector('button[data-test="plus-no-thanks"], button[data-test="practice-hub-ad-no-thanks-button"]')
               if (skip_el) {
                   skip_el.click()
                   return
