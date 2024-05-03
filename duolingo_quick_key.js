@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-02
+// @version      2024-05-03
 // @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
@@ -22,7 +22,7 @@
 (function() {
   'use strict'
   // 选词键顺序
-  var chars='abcdefghijklmnopqrstuvwxyz1234567890-=[],./'
+  var chars='abcdefghijklnopqrstuvxyz1234567890-=[],./'
   // 题目区元素相关数据对象
   // type -1: 无效 0: 选择题(自带[数字],不需要处理) 1: 组句题 2: 配对题(自带[数字],不需要处理) 3: 填空题(自带[首字母], 不需要处理)
   // el: 主要题目区元素
@@ -86,6 +86,9 @@
       if (question.type == 1) {
           for (var i=0; i< question.el.children.length; i++) {
               var item = question.el.children[i]
+              // 修改按钮padding, 加宽以防止序号覆盖文字
+              item.querySelector('button').setAttribute('style', '--web-ui_button-padding: 8px 4px 8px 10px;')
+              // 添加序号
               let new_el = document.createElement('span')
               new_el.textContent = chars.charAt(i)
               // new_el.className = 'p_item_tip'
