@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-03
+// @version      2024-05-04
 // @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
@@ -24,7 +24,8 @@
   // 选词键顺序
   var chars='abcdefghijklnopqrstuvxyz1234567890-=[],./'
   // 题目区元素相关数据对象
-  // type -1: 无效 0: 选择题(自带[数字],不需要处理) 1: 组句题 2: 配对题(自带[数字],不需要处理) 3: 填空题(自带[首字母], 不需要处理)
+  // type -1: 无效 0: 选择题(自带[数字]快捷键) 1: 组句题 2: 配对题(自带[数字]快捷键) 
+  // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理)
   // el: 主要题目区元素
   // el2: 次要题目区元素
   var question = {type: -1}
@@ -32,6 +33,13 @@
   var init_question = function() {
       if (question.type > -1) {
           return question
+      }
+      
+      // 听写题
+      question.el = document.querySelector('div[data-test="challenge challenge-listenTap"]')
+      if (question.el) {
+          question.type = 4
+          return
       }
       // 填空题(自带,不需要处理)
       question.el = document.querySelector('div[data-test="challenge challenge-tapComplete"]')
@@ -138,16 +146,15 @@
           if (event.key == 'Delete') {
               if (question.el2) {
                   var selects = question.el2.children
-                  var cnt = selects.length
-                  for (var i=cnt; cnt > 0; cnt--) {
-                      var select = selects[cnt - 1]
+                  for (var i=selects.length; i > 0; i--) {
+                      var select = selects[i - 1]
                       select.querySelector('button').click()
                   }
               }
               return
           }
           // 按z键时如果页面有"不,谢谢"按钮, 就点击它
-          if (event.key == 'z') {
+          if (event.key == 'z' && question.type == -1) {
               var skip_el = document.querySelector('button[data-test="plus-no-thanks"], button[data-test="practice-hub-ad-no-thanks-button"]')
               if (skip_el) {
                   skip_el.click()
@@ -195,8 +202,7 @@
                       return
                   }
                   var text = item.querySelector('span[data-test="challenge-tap-token-text"').innerHTML
-                  var selects_div = question.el2
-                  var selects = selects_div.querySelectorAll('span[data-test="challenge-tap-token-text"]')
+                  var selects = question.el2.querySelectorAll('span[data-test="challenge-tap-token-text"]')
                   for (var i= 0; i < selects.length; i++) {
                       var select = selects[i]
                       if (select.innerHTML == text) {
