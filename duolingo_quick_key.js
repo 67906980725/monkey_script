@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-04
-// @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
+// @version      2024-05-05
+// @description  使用快捷键刷多邻国. 在主页面使用回车键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
 // @match        https://www.duolingo.com/*
@@ -25,7 +25,7 @@
   var chars='abcdefghijklnopqrstuvxyz1234567890-=[],./'
   // 题目区元素相关数据对象
   // type -1: 无效 0: 选择题(自带[数字]快捷键) 1: 组句题 2: 配对题(自带[数字]快捷键) 
-  // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理)
+  // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理) 5: 听写填空题(不需要处理) 
   // el: 主要题目区元素
   // el2: 次要题目区元素
   var question = {type: -1}
@@ -35,7 +35,13 @@
           return question
       }
       
-      // 听写题
+      // 听写填空题(不需要处理) 
+      question.el = document.querySelector('div[data-test="challenge challenge-listenComplete"]')
+      if (question.el) {
+          question.type = 5
+          return
+      }
+      // 听写题(不需要处理)
       question.el = document.querySelector('div[data-test="challenge challenge-listenTap"]')
       if (question.el) {
           question.type = 4
@@ -113,10 +119,14 @@
       // GM_log(event.key)
       // 当前页
       var page_name = window.location.pathname
-      // 在主页时 按l键直接学习(跳转/lesson页)
+      // 在主页
       if (page_name == '/learn') {
-          if (event.key == 'l') {
-              window.location.href = 'lesson'; return
+          // 按回车键直接学习(跳转/lesson页)
+          if (event.key == 'Enter') {
+              setTimeout(function() {
+                  var el = document.querySelector('a[href="/lesson"]')
+                  if (el) { el.click() }
+              }, 150)
           }
           return
       }
@@ -234,6 +244,6 @@
   }
 
   // 页面加载后第一个题就是组句题的情况, 添加序号
-  setTimeout(process_order, 2000)
+  setTimeout(process_order, 6000)
 
 })()
