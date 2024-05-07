@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-06
+// @version      2024-05-07
 // @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
