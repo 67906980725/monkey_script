@@ -2,7 +2,7 @@
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-06
-// @description  使用快捷键刷多邻国. 在主页面使用回车键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
+// @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
 // @match        https://www.duolingo.com/*
@@ -143,12 +143,18 @@
 
   // 按键事件监听
   document.addEventListener('keyup', function (event) {
-    // GM_log(event.key)
+    // GM_log('按键:' + event.key)
     // 当前页
     var page_name = window.location.pathname
     // 在主页
     if (page_name == '/learn') {
+      // 按l键直接学习(跳转/lesson页)
+      if (event.key == 'l') {
+        window.location.href = '/lesson'
+      }
+
       // 按回车键直接学习(跳转/lesson页)
+      // 官方回车键失效?
       if (event.key == 'Enter') {
         setTimeout(function () {
           var el = document.querySelector('a[href="/lesson"]')
@@ -161,7 +167,7 @@
     }
 
     // 在学习页
-    if (page_name == '/lesson') {
+    if (page_name.startsWith('/lesson')) {
       // 初始化题目区数据
       init_question()
       // 回车键: 延时为下一题单词/短语添加序号
