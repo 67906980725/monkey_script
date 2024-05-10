@@ -2,7 +2,7 @@
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
 // @version      2024-05-07
-// @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站
+// @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站. 如果发生无法输入文字的情况可以尝试在网页限制解除/文本选中复制相关脚本中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
 // @match        https://www.duolingo.com/*
@@ -25,7 +25,8 @@
   var chars = 'abcdefghijklnopqrstuvxyz1234567890-=[],./'
   // 题目区元素相关数据对象
   // type -1: 无效 0: 选择题(自带[数字]快捷键) 1: 组句题 2: 配对题(自带[数字]快捷键)
-  // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理) 5: 听写填空题(不需要处理) 6: 小故事
+  // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理) 5: 听写填空题(不需要处理) 
+  // 6: 小故事 7: 补全题(自带[首字母]快捷键)
   // el: 主要题目区元素
   // el2: 次要题目区元素
   var question = { type: -1 }
@@ -35,6 +36,14 @@
       return question
     }
 
+    // 补全题(不需要处理)
+    question.el = document.querySelector(
+      'div[data-test="challenge challenge-tapCloze"]'
+    )
+    if (question.el) {
+      question.type = 7
+      return
+    }
     // 小故事
     question.el = document.getElementsByClassName('kbjat')
     if (question.el.length) {
@@ -115,7 +124,8 @@
   // 为单词/短语添加序号方法
   var process_order = function () {
     var play_btn = document.querySelector('button[data-test="player-next"]')
-    if (!play_btn || play_btn.getAttribute('aria-disabled') != 'true') {
+    if (!play_btn) {
+      //  || play_btn.getAttribute('aria-disabled') != 'true'
       return
     }
     init_question()
@@ -157,7 +167,7 @@
       // 官方回车键失效?
       if (event.key == 'Enter') {
         setTimeout(function () {
-          var el = document.querySelector('a[href="/lesson"]')
+          var el = document.querySelector('a[href="/lesson"], a[href="/lesson?mode=LISTEN"]')
           if (el) {
             el.click()
           }
@@ -355,7 +365,4 @@
       //    }
     }
   })
-
-  // 页面加载后第一个题就是组句题的情况, 添加序号
-  setTimeout(process_order, 6000)
 })()
