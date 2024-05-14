@@ -26,7 +26,7 @@
   // 题目区元素相关数据对象
   // type -1: 无效 0: 选择题(自带[数字]快捷键) 1: 组句题 2: 配对题(自带[数字]快捷键)
   // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理) 5: 听写填空题(不需要处理) 
-  // 6: 小故事 7: 补全题(自带[首字母]快捷键)
+  // 6: 小故事 7: 补全题(自带[首字母]快捷键) 8: 口语题
   // el: 主要题目区元素
   // el2: 次要题目区元素
   var question = { type: -1 }
@@ -36,6 +36,14 @@
       return question
     }
 
+    // 口语题
+    question.el = document.querySelector(
+      'div[data-test="challenge challenge-speak"]'
+    )
+    if (question.el) {
+      question.type = 8
+      return
+    }
     // 补全题(不需要处理)
     question.el = document.querySelector(
       'div[data-test="challenge challenge-tapCloze"]'
@@ -209,22 +217,40 @@
         return
       }
       // 没有题目区时, 按z键时如果页面有"不,谢谢"按钮, 就点击它
-      if (event.key == 'z' && question.type == -1) {
-        // 跳过按钮
-        var skip_el = document.querySelector(
-          'button[data-test="plus-no-thanks"], button[data-test="practice-hub-ad-no-thanks-button"]'
-        )
-        if (skip_el) {
-          skip_el.click()
+      if (event.key == 'z') {
+        // 没有题时
+        if (question.type == -1) {
+          // 跳过按钮
+          var skip_el = document.querySelector(
+            'button[data-test="plus-no-thanks"], button[data-test="practice-hub-ad-no-thanks-button"]'
+          )
+          if (skip_el) {
+            skip_el.click()
+            return
+          }
+          // 挑战传奇按钮
+          var legendary_el = document.querySelector(
+            'a[data-test="legendary-start-button"]'
+          )
+          if (legendary_el) {
+            // 找到"继续"按钮并点击
+            legendary_el.parentElement.nextElementSibling.children[0].children[1].click()
+          }
           return
         }
-        // 挑战传奇按钮
-        var legendary_el = document.querySelector(
-          'a[data-test="legendary-start-button"]'
-        )
-        if (legendary_el) {
-          // 找到"继续"按钮并点击
-          legendary_el.parentElement.nextElementSibling.children[0].children[1].click()
+        // 口语题时
+        if (question.type == 8) {
+          // 跳过按钮
+          var skip_el = document.querySelector('button[data-test="player-skip"]')
+          if (skip_el) {
+            skip_el.click()
+            setTimeout(function () {
+              var el = document.querySelector('button[data-test="player-next"]')
+              if (el) {
+                el.click()
+              }
+            }, 200)
+          }
           return
         }
       }
