@@ -244,12 +244,6 @@
           var skip_el = document.querySelector('button[data-test="player-skip"]')
           if (skip_el) {
             skip_el.click()
-            setTimeout(function () {
-              var el = document.querySelector('button[data-test="player-next"]')
-              if (el) {
-                el.click()
-              }
-            }, 200)
           }
           return
         }
