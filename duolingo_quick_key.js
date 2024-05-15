@@ -38,7 +38,7 @@
 
     // 口语题
     question.el = document.querySelector(
-      'div[data-test="challenge challenge-speak"]'
+      'div[data-test="challenge challenge-speak"], div[data-test="challenge challenge-listenSpeak"]'
     )
     if (question.el) {
       question.type = 8
