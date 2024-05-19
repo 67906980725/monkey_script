@@ -172,8 +172,14 @@
       }
 
       // 按回车键直接学习(跳转/lesson页)
-      // 官方回车键失效?
       if (event.key == 'Enter') {
+        // 不在当前部分时点击"前往当前部分"按钮
+        var el = document.querySelector('button[aria-label="前往当前部分"]')
+        if (el) {
+          el.click()
+          return
+        }
+
         setTimeout(function () {
           var el = document.querySelector('a[href="/lesson"], a[href="/lesson?mode=LISTEN"]')
           if (el) {
