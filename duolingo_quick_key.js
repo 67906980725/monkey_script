@@ -186,6 +186,15 @@
             el.click()
           }
         }, 150)
+        return
+      }
+      if (event.key == 'z') {
+        // 连胜激动不谢谢按钮
+        var el = document.querySelector('button[data-test="notification-drawer-no-thanks-button"]')
+        if (el) {
+          el.click()
+        }
+        return
       }
       return
     }
