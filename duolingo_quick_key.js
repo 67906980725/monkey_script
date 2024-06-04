@@ -174,7 +174,7 @@
       // 按回车键直接学习(跳转/lesson页)
       if (event.key == 'Enter') {
         // 不在当前部分时点击"前往当前部分"按钮
-        var el = document.querySelector('button[aria-label="前往当前部分"]')
+        var el = document.querySelector('button[aria-label="前往当前部分"], button[aria-label="Go to current unit"]')
         if (el) {
           el.click()
           return
