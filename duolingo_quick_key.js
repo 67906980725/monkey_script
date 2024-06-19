@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         多邻国选词快捷键
 // @namespace    http://tampermonkey.net/
-// @version      2024-05-07
+// @version      2024-06-19
 // @description  使用快捷键刷多邻国. 在主页面使用l键快速开始学习;在学习页使用ctrl键播放语音, 使用回车键提交答案时为选词添加序号,退格键删除选词,删除键删除全部选词. 如果官方和脚本的快捷键无法正常使用, 需要在`vimium-c`等快捷键相关插件中排除多邻国网站. 如果发生无法输入文字的情况可以尝试在网页限制解除/文本选中复制相关脚本中排除多邻国网站
 // @author       v
 // @match        https://www.duolingo.cn/*
@@ -19,12 +19,14 @@
 // todo GM_addStyle(...) is not a function
 // GM_addStyle(".p_item_tip {position: absolute; color: dodgerblue; background-color: greenyellow; border-radius: 5px; !important;}")
 
-;(function () {
+; (function () {
   'use strict'
   // 选词键顺序
   var chars = 'abcdefghijklnopqrstuvxyz1234567890-=[],./'
   // 题目区元素相关数据对象
-  // type -1: 无效 0: 选择题(自带[数字]快捷键) 1: 组句题 2: 配对题(自带[数字]快捷键)
+  // type -1: 无效 0: 选择题(自带[数字]快捷键) 
+  // 1: 从英文翻译组句题 1.1: 翻译到英文组句题 1.2 翻译到英文手写题 
+  // 2: 配对题(自带[数字]快捷键)
   // 3: 填空题(自带[首字母]快捷键) 4: 听写题(不需要处理) 5: 听写填空题(不需要处理) 
   // 6: 小故事 7: 补全题(自带[首字母]快捷键) 8: 口语题
   // el: 主要题目区元素
@@ -35,6 +37,9 @@
     if (question.type > -1) {
       return question
     }
+
+    // 未知题型
+    question.type = -1
 
     // 口语题
     question.el = document.querySelector(
@@ -96,12 +101,33 @@
       question.type = 2
       return
     }
-    // 组句题
-    question.el = document.querySelector('div[data-test="word-bank"]')
+    // 翻译题: 从英文翻译组句题; 翻译到英文组句题; 翻译到英文手写题
+    // 只需要处理从英文翻译组句题, 其它忽略
+    question.el = document.querySelector('div[data-test="challenge challenge-translate"]')
     if (question.el) {
-      question.type = 1
-      question.el2 =
-        question.el.parentElement.previousElementSibling.children[0].children[0].children[1]
+      // 组句题
+      var el = question.el.querySelector('div[data-test="word-bank"]')
+      if (el) {
+        var word = el.querySelector('button')
+        if (!word) { return }
+        // 字/词语言是英文, 翻译到英文组句题
+        if (word.lang == 'en') {
+          question.type = 1.1
+          return
+        } else {
+          // 从英文翻译组句题
+          question.el = el
+          question.type = 1
+          question.el2 = question.el.parentElement.previousElementSibling.children[0].children[0].children[1]
+          return
+        }
+      }
+      // 翻译到英文手写题
+      el = question.el.querySelector('textarea[data-test="challenge-translate-input"]')
+      if (el) {
+        question.type = 1.2
+        return
+      }
       return
     }
     // 选择题(自带,不需要处理)
@@ -115,7 +141,7 @@
   }
 
   // 防抖方法
-  function debounce (func, delay) {
+  function debounce(func, delay) {
     let timeout
     return function () {
       const _this = this
