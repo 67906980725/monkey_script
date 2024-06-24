@@ -66,6 +66,12 @@
       question.prop_field = Object.keys(question.el[0]).find(p =>
         p.startsWith('__reactFiber')
       )
+
+      // 小屏幕设备最后连连看会显示不全, 把顶部白色背景去掉
+      var el = document.querySelector(".mAxZF")
+      if (el) {
+        el.style.backgroundColor = "transparent"
+      }
       return
     }
     // 听写填空题(不需要处理)
