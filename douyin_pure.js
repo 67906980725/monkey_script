@@ -43,9 +43,24 @@
       rm_temp_sidebar()
     }
 
-    var full_screen_btn = document.getElementsByClassName("xgplayer-fullscreen")[0]
-    full_screen_btn.addEventListener("mouseover", clean)
-    full_screen_btn.addEventListener("click", clean)
+    // temp_sidebar会自动回来并且全屏按钮添加的事件会自动失效
+    // var full_screen_btn = document.getElementsByClassName("xgplayer-fullscreen")[0]
+    // full_screen_btn.addEventListener("mouseover", clean)
+    // full_screen_btn.addEventListener("click", clean)
+
+    // 改使用死循环每隔5秒移除一次temp_sidebar
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+    async function asyncWhile(conditionFunc, actionFunc, interval = 1000) {
+      while (await conditionFunc()) {
+        await actionFunc()
+        await sleep(interval)
+      }
+    }
+    (async () => {
+      await asyncWhile(async () => true, clean, 5000)
+    })()
 
   }
 })()
