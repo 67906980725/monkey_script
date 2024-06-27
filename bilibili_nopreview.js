@@ -11,6 +11,8 @@
 
 (function() {
   'use strict'
+
+  // div class="bili-video-card__image--wrap" mouseenter
   document.addEventListener('mouseenter', function(event) {
     event.stopPropagation()
     event.stopImmediatePropagation()
