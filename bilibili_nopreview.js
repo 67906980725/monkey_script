@@ -5,6 +5,7 @@
 // @description  bilibili禁止首页视频自动预览
 // @author       v
 // @match        https://www.bilibili.com/*
+// @match        https://search.bilibili.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=bilibili.com
 // @grant        none
 // ==/UserScript==
