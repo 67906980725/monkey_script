@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         网页翻译-总是聚焦输入框
+// @name         网页翻译-快捷键聚焦输入框
 // @namespace    http://tampermonkey.net/
 // @version      2024-07-01
-// @description  将百度/有道翻译/DeepL等页面总是聚焦在输入框
+// @description  在百度/有道翻译/DeepL等页面按快捷键聚焦输入框
 // @author       v
 // @match        https://fanyi.baidu.com/*
 // @match        https://fanyi.youdao.com/*
@@ -11,19 +11,18 @@
 // @grant        GM_log
 // ==/UserScript==
 
-(function() {
+(function () {
   'use strict'
-  window.onload = function() {
+  window.onload = function () {
     var host = window.location.hostname
     var get_el_fns = {
-      'fanyi.baidu.com': function() {
+      'fanyi.baidu.com': function () {
         return document.getElementById('baidu_translate_input')
       },
       'fanyi.youdao.com': function () {
         return document.getElementById('js_fanyi_input')
       },
-      // vimium-c似乎对聚焦有影响?
-      'www.deepl.com': function() {
+      'www.deepl.com': function () {
         return document.querySelector('div[_d-id="1"]')
       }
     }
@@ -55,13 +54,27 @@
       if (!el) {
         GM_log('未获取到元素')
       } else {
-        el.click()
-        el.focus()
-        el.addEventListener('blur', function() {
-          setTimeout(function() {
-            el.click()
-            el.focus()
-          }, 2000)
+        // 聚焦方法
+        function select_all(_el) {
+          el.focus()
+          var tag = _el.tagName.toLowerCase()
+          if (tag == 'div') {
+            var range = document.createRange()
+            range.selectNodeContents(_el)
+            var selection = window.getSelection()
+            selection.removeAllRanges()
+            selection.addRange(range)
+          } else if (tag == 'textarea') {
+            _el.setSelectionRange(0, _el.value.length)
+          }
+        }
+        select_all(el)
+        document.addEventListener('keydown', function (event) {
+          //GM_log('按下按键:' + event.key)
+          // 同时按下ctrl+alt聚焦
+          if (event.ctrlKey && event.altKey) {
+            select_all(el)
+          }
         })
       }
     })()
