@@ -56,7 +56,7 @@
       } else {
         // 聚焦方法
         function select_all(_el) {
-          el.focus()
+          _el.focus()
           var tag = _el.tagName.toLowerCase()
           if (tag == 'div') {
             var range = document.createRange()
