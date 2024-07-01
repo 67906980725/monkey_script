@@ -2,7 +2,7 @@
 // @name         bilibili禁止首页视频自动预览
 // @namespace    http://tampermonkey.net/
 // @version      2024-06-27
-// @description  bilibili禁止首页视频自动预览
+// @description  禁止首页视频自动预览
 // @author       v
 // @match        https://www.bilibili.com/*
 // @match        https://search.bilibili.com/*
